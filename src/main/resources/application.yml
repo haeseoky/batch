@@ -1,0 +1,20 @@
+spring:
+  profiles:
+    active: local
+
+---
+spring:
+  profiles: local
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC
+    username: root
+    password: yun1206
+    driver-class-name: com.mysql.cj.jdbc.Driver
+---
+spring:
+  profiles: mysql
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC
+    username: root
+    password: yun1206
+    driver-class-name: com.mysql.cj.jdbc.Driver
