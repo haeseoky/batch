@@ -4,19 +4,14 @@ spring:
 
 spring.batch.job.names: ${job.name:NONE}
 logging.level.org.springframework.batch: DEBUG
+
 ---
 spring:
   profiles: local
   datasource:
-    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC
-    username: root
-    password: yun1206
-    driver-class-name: com.mysql.cj.jdbc.Driver
----
-spring:
-  profiles: mysql
-  datasource:
-    url: jdbc:mysql://localhost:3306/test?serverTimezone=UTC
-    username: root
-    password: yun1206
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:jtds:sybase://129.100.254.242:4000/tip;charset=eucksc;prepareSQL=0;socketTimeout=30
+    username: tip
+    password: tipuse
+    driver-class-name: net.sourceforge.jtds.jdbc.Driver
+    hikari:
+      connection-test-query: select 1
