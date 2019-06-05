@@ -24,15 +24,30 @@ public class NoticeSendTest {
     Job noticeSendPagingJob;
 
     @Autowired
+    @Qualifier("noticeSendTaskletJob")
+    Job noticeSendTaskletJob;
+
+    @Autowired
     JobLauncher jobLauncher;
 
     @Test
-    public void mybatisPaging() throws Exception {
+    public void noticeSendPaging() throws Exception {
         JobParametersBuilder builder = new JobParametersBuilder();
         builder.addString("memberNumber", "52009342941");
         builder.addLong("time", System.currentTimeMillis());    // 파라미터값을 변경해서 계속 실행되도록 처리
 
         JobExecution jobExecution = jobLauncher.run(noticeSendPagingJob, builder.toJobParameters());
+
+        assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+    }
+
+    @Test
+    public void noticeSendTasklet() throws Exception {
+        JobParametersBuilder builder = new JobParametersBuilder();
+        builder.addString("memberNumber", "52009342941");
+        builder.addLong("time", System.currentTimeMillis());
+
+        JobExecution jobExecution = jobLauncher.run(noticeSendTaskletJob, builder.toJobParameters());
 
         assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
     }

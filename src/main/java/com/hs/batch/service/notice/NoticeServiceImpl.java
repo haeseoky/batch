@@ -15,7 +15,6 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public List<NoticeSend> findNoticeSend(String memberNumber) {
-
         List<NoticeSend> result = noticeMapper.findNoticeSendByMemberNumber(memberNumber);
 
         result.forEach(item -> {
@@ -23,5 +22,10 @@ public class NoticeServiceImpl implements NoticeService {
         });
 
         return result;
+    }
+
+    @Override
+    public int createNoticeSend(NoticeSend noticeSend) {
+        return noticeMapper.createNoticeSend(noticeSend);
     }
 }

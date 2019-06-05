@@ -16,7 +16,9 @@ import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -45,6 +47,10 @@ import java.util.Map;
  * #{_page} 현재 페이지 (0부터 시작)
  * #{_pagesize} reader 의 pageSize 값
  * #{_skiprows} _page * _pagesize 값
+ *
+ *
+ * 아래쪽에 기존방식인 tasklet 방식 예제
+ * chunk 방식 사용 안함 (reader, writer 없음)
  */
 @Configuration
 @Slf4j
@@ -173,5 +179,48 @@ public class NoticeSendJobConfiguration {
                 .statementId("com.hs.batch.dao.notice.NoticeMapper.createNoticeSend")
                 .build();
     }
-}
 
+    /**
+     * tasklet 방식의 job 설정
+     *
+     * @return
+     */
+    @Bean
+    public Job noticeSendTaskletJob() {
+        return jobBuilderFactory.get("noticeSendTaskletJob")
+                .start(noticeSendTaskletStep())
+                .build();
+    }
+
+    /**
+     * tasklet 방식 step 설정
+     * @return
+     */
+    @Bean
+    @JobScope
+    public Step noticeSendTaskletStep() {
+        return stepBuilderFactory.get("noticeSendTaskletStep")
+                .tasklet(noticeSendTasklet())
+                .build();
+    }
+
+    /**
+     * tasklet 설정
+     *
+     * 직접 select 후 insert 처리
+     *
+     * @return
+     */
+    @Bean
+    @StepScope
+    public Tasklet noticeSendTasklet() {
+        return (contribution, chunkContext) -> {
+            String memberNumber = (String) chunkContext.getStepContext().getJobParameters().get("memberNumber");
+            List<NoticeSend> noticeSend = noticeService.findNoticeSend(memberNumber);
+
+            noticeSend.forEach(item -> noticeService.createNoticeSend(item));
+
+            return RepeatStatus.FINISHED;
+        };
+    }
+}

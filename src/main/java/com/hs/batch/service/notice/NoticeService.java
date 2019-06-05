@@ -16,4 +16,6 @@ public interface NoticeService {
      * @return noticesend 목록
      */
     List<NoticeSend> findNoticeSend(String memberNumber);
+
+    int createNoticeSend(NoticeSend noticeSend);
 }

@@ -15,4 +15,6 @@ import java.util.List;
 @Mapper
 public interface NoticeMapper {
     List<NoticeSend> findNoticeSendByMemberNumber(String memberNumber);
+
+    int createNoticeSend(NoticeSend noticeSend);
 }
