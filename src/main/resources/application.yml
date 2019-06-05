@@ -15,3 +15,24 @@ spring:
     driver-class-name: net.sourceforge.jtds.jdbc.Driver
     hikari:
       connection-test-query: select 1
+---
+spring:
+  profiles: prod
+  datasource:
+    url: jdbc:jtds:sybase://129.100.254.64:3000/tip;charset=eucksc;prepareSQL=0;socketTimeout=30
+    username: tip
+    password: tipuse
+    driver-class-name: net.sourceforge.jtds.jdbc.Driver
+    hikari:
+      connection-test-query: select 1
+---
+mybatis:
+  configuration:
+    cache-enabled: true
+    default-executor-type: batch
+    auto-mapping-behavior: partial
+    lazy-loading-enabled: true
+    jdbc-type-for-null: varchar
+  type-aliases-package: com.hs.batch.dto
+  type-handlers-package: com.hs.batch.common.typehandler
+  mapper-locations: com.hs.batch.dao/**/*.xml

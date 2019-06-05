@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hs.batch.dao.notice.NoticeMapper">
+
+    <resultMap id="rmNoticeSend" type="noticeSend">
+        <result property="noticeId" column="notice_id"/>
+        <result property="memberNumber" column="memno"/>
+        <result property="pushStatus" column="push_status"/>
+    </resultMap>
+
+    <!-- 추천도서 상단 주제리스트 -->
+    <select id="findNoticeSendListByMemberNumber" resultMap="rmNoticeSend">
+        DECLARE @memno          CHAR(11)
+              , @pageNumber     INT
+              , @perPage        INT
+              , @position     	INT
+              , @page_delete 	INT
+
+        SET @memno = #{memberNumber}
+        SET @pageNumber = #{_page}
+        SET @perPage = #{_pagesize}
+        SET @page_delete = #{_skiprows}
+        SET @position = @page_delete + @perPage
+
+        SET TRANSACTION ISOLATION LEVEL 0
+
+		SET ROWCOUNT @position
+		SELECT notice_id
+			 , memno
+			 , push_status
+		  INTO #TMP_MOK_BATCH_NOTICE_SEND
+		  FROM tip..MOK_NOTICE_SEND
+		 WHERE memno = @memno
+
+        SET ROWCOUNT @page_delete
+        IF @page_delete > 0
+            DELETE FROM #TMP_MOK_BATCH_NOTICE_SEND
+
+		SELECT notice_id
+			 , memno
+			 , push_status
+		  FROM #TMP_MOK_BATCH_NOTICE_SEND
+            AT ISOLATION 0
+
+        DROP TABLE #TMP_MOK_BATCH_NOTICE_SEND
+
+        SET ROWCOUNT 0
+
+        SET TRANSACTION ISOLATION LEVEL 1
+    </select>
+
+    <select id="findNoticeSendByMemberNumber" parameterType="string" resultMap="rmNoticeSend">
+		SELECT notice_id
+			 , memno
+			 , push_status
+		  FROM tip..MOK_NOTICE_SEND
+		 WHERE memno = #{memberNumber}
+    </select>
+
+	<insert id="createNoticeSend" parameterType="noticeSend">
+		INSERT INTO tip..MOK_NOTICE_SEND_TEMP (notice_id, memno, push_status)
+		VALUES (#{noticeId}, #{memberNumber}, #{pushStatus})
+	</insert>
+    
+</mapper>
